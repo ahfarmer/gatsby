@@ -86,7 +86,7 @@ module.exports = async (program: any) => {
   const flattenedPlugins = await loadPlugins(config)
 
   // Check if any plugins have been updated since our last run. If so
-  // we delete the cache is there's likely been changes
+  // we delete the cache as there have likely been changes
   // since the previous run.
   //
   // We do this by creating a hash of all the version numbers of installed
@@ -316,6 +316,12 @@ data
   activity = activityTimer(`update schema`)
   activity.start()
   await require(`../schema`)()
+  activity.end()
+
+  // Call createPages any time a new node is created
+  activity = activityTimer(`extract queries from components`)
+  activity.start()
+  await require(`../redux/plugin-watcher`)
   activity.end()
 
   const checkJobsDone = _.debounce(resolve => {
