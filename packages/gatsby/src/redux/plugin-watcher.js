@@ -4,6 +4,36 @@ const { store, emitter } = require(`./index`)
 const apiRunnerNode = require(`../utils/api-runner-node`)
 const { graphql } = require(`graphql`)
 
+// const {
+//   extractQueries,
+// } = require(`../internal-plugins/query-runner/query-watcher`)
+// const {
+//   runQueries,
+// } = require(`../internal-plugins/query-runner/page-query-runner`)
+const { writePages } = require(`../internal-plugins/query-runner/pages-writer`)
+
+
+async function updatePages() {
+  // TODO: compare pages before & after running create pages
+
+  const graphqlRunner = (query, context = {}) => {
+    const schema = store.getState().schema
+    return graphql(schema, query, context, context, context)
+  }
+
+  console.log(`before pages`, store.getState().pages)
+
+  await apiRunnerNode(`createPages`, {
+    graphql: graphqlRunner,
+    traceId: `watch-createPages`,
+    waitForCascadingActions: true,
+  })
+
+  console.log(`after pages`, store.getState().pages)
+
+  await writePages()
+}
+
 let dirty = false
 
 emitter.on(`CREATE_NODE`, action => {
@@ -18,22 +48,5 @@ emitter.on(`API_RUNNING_QUEUE_EMPTY`, action => {
   }
   dirty = false
 
-  // TODO: compare pages before & after running create pages
-
-  const graphqlRunner = (query, context = {}) => {
-    const schema = store.getState().schema
-    return graphql(schema, query, context, context, context)
-  }
-
-  apiRunnerNode(`createPages`, {
-    graphql: graphqlRunner,
-    traceId: `watch-createPages`,
-    waitForCascadingActions: true,
-  })
-    .then((result) => {
-      console.log(`plugin-watcher createPages RESULT:`, result)
-    })
-    .catch((err) => {
-      console.warn(`plugin-watcher createPages error:`, err)
-    })
+  updatePages()
 })
