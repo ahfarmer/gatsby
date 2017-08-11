@@ -16,7 +16,6 @@ let active = false
 
 exports.runQueries = async () => {
   active = true
-  const state = store.getState()
 
   // Run queued dirty nodes now that we're active.
   queuedDirtyActions = _.uniq(queuedDirtyActions, a => a.payload.id)
@@ -35,8 +34,10 @@ emitter.on(`CREATE_NODE`, action => {
 })
 
 const runQueuedActions = async () => {
+  console.log(`PQR runQueuedActions active:${active}`)
   if (active) {
     queuedDirtyActions = _.uniq(queuedDirtyActions, a => a.payload.id)
+    // console.log(`PQR queuedDirtyActions:${JSON.stringify(queuedDirtyActions, null, 2)}`)
     await runQueriesForIds(findDirtyIds(queuedDirtyActions))
     queuedDirtyActions = []
   }
@@ -70,7 +71,10 @@ const findIdsWithoutDataDependencies = () => {
 }
 
 const runQueriesForIds = ids => {
+  console.log(`PQR runQueriesForIds: ${ids}`)
+
   if (ids.length < 1) {
+    console.log(`PQR NO IDs`)
     return Promise.resolve()
   }
   const state = store.getState()
@@ -89,9 +93,10 @@ const findDirtyIds = actions => {
   const state = store.getState()
   return actions.reduce((dirtyIds, action) => {
     const node = state.nodes[action.payload.id]
+
     // Check if the node was deleted
     if (!node) {
-      return
+      return dirtyIds
     }
 
     // find invalid pagesAndLayouts
@@ -102,6 +107,7 @@ const findDirtyIds = actions => {
       state.componentDataDependencies.connections[node.internal.type]
     )
 
+    // TODO: how do I find out if
     return _.compact(dirtyIds)
   }, [])
 }

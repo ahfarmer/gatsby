@@ -1,5 +1,4 @@
 const fs = require(`fs`)
-const path = require(`path`)
 const { joinPath } = require(`../../utils/path`)
 const { watchComponent } = require(`./query-watcher`)
 
@@ -41,9 +40,11 @@ const handlePageOrLayout = store => pageOrLayout => {
 }
 
 exports.onCreatePage = ({ page, store, boundActionCreators }) => {
+  console.log(`query-runner onCreatePage page:${page.path}`)
   handlePageOrLayout(store)(page)
 }
 
 exports.onCreateLayout = ({ layout, store, boundActionCreators }) => {
+  console.log(`query-runner onCreateLayout layout:${layout.path}`)
   handlePageOrLayout(store)(layout)
 }

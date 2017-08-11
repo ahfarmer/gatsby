@@ -301,6 +301,12 @@ module.exports = async (program: any) => {
   await require(`../schema`)()
   activity.end()
 
+  // Update pages when graphql data changes
+  activity = report.activityTimer(`watch plugins`)
+  activity.start()
+  await require(`../redux/plugin-watcher`)
+  activity.end()
+
   const checkJobsDone = _.debounce(resolve => {
     const state = store.getState()
     if (state.jobs.active.length === 0) {

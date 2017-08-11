@@ -17,7 +17,7 @@ const report = require(`../reporter`)
 const { formatStaticBuildError } = require(`../reporter/errors`)
 
 // Watch the static directory and copy files to public as they're added or
-// changed. Wait 10 seconds so copying doesn't interfer with the regular
+// changed. Wait 10 seconds so copying doesn't interfere with the regular
 // bootstrap.
 setTimeout(() => {
   copyStaticDirectory()

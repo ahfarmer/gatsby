@@ -10,6 +10,8 @@ const { store } = require(`../../redux`)
 
 // Run query for a page
 module.exports = async (pageOrLayout, component) => {
+  console.log(`QRQR pageOrLayout.path:${JSON.stringify(pageOrLayout.path, null, 2)}`)
+
   const { schema, program } = store.getState()
 
   const graphql = (query, context) =>
@@ -62,6 +64,11 @@ module.exports = async (pageOrLayout, component) => {
   }
   result[contextKey] = pageOrLayout.context
   const resultJSON = JSON.stringify(result, null, 4)
+
+  // console.log(`component.query`, component.query)
+  // console.log(`result`, result)
+  // console.log(`query-runner.js writing ${joinPath(program.directory, `.cache`, `json`, pageOrLayout.jsonName)}`)
+
   return writeFileAsync(
     joinPath(program.directory, `.cache`, `json`, pageOrLayout.jsonName),
     resultJSON
