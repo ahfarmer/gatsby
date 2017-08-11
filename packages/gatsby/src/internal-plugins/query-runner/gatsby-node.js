@@ -5,6 +5,8 @@ const { watchComponent } = require(`./query-watcher`)
 
 let pageComponents = {}
 exports.onCreatePage = ({ page, store, boundActionCreators }) => {
+  console.log(`query-runner onCreatePage page:${page.path}`)
+
   const component = page.component
   if (!pageComponents[component]) {
     // We haven't seen this component before so we:
@@ -17,9 +19,11 @@ exports.onCreatePage = ({ page, store, boundActionCreators }) => {
       `json`,
       page.jsonName
     )
+    console.log(`query-runner/gatsby-node.js ${pathToJSONFile}`)
     if (!fs.existsSync(pathToJSONFile)) {
       fs.writeFile(pathToJSONFile, `{}`, () => {})
     }
+    // process.exit()
     boundActionCreators.createPageComponent(component)
 
     // Make sure we're watching this component.

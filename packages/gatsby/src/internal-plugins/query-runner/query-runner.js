@@ -45,6 +45,10 @@ module.exports = async (page, component) => {
   // Add the path context onto the results.
   result.pathContext = page.context
   const resultJSON = JSON.stringify(result, null, 4)
+  console.log('component.query', component.query);
+  console.log('result', result);
+  console.log(`query-runner.js writing ${joinPath(program.directory, `.cache`, `json`, page.jsonName)}`)
+
   return writeFileAsync(
     joinPath(program.directory, `.cache`, `json`, page.jsonName),
     resultJSON

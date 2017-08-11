@@ -156,6 +156,8 @@ data
   activity.start()
   const srcDir = `${__dirname}/../cache-dir`
   const siteDir = `${program.directory}/.cache`
+  console.log(`srcDir:${srcDir} siteDir:${siteDir}`)
+  
   try {
     await fs.copy(srcDir, siteDir, { clobber: true })
     await fs.mkdirs(`${program.directory}/.cache/json`)

@@ -4,13 +4,15 @@ const { store, emitter } = require(`./index`)
 const apiRunnerNode = require(`../utils/api-runner-node`)
 const { graphql } = require(`graphql`)
 
+let dirty = false
+
 // const {
 //   extractQueries,
 // } = require(`../internal-plugins/query-runner/query-watcher`)
 // const {
 //   runQueries,
 // } = require(`../internal-plugins/query-runner/page-query-runner`)
-const { writePages } = require(`../internal-plugins/query-runner/pages-writer`)
+// const { writePages } = require(`../internal-plugins/query-runner/pages-writer`)
 
 
 async function updatePages() {
@@ -21,32 +23,32 @@ async function updatePages() {
     return graphql(schema, query, context, context, context)
   }
 
-  console.log(`before pages`, store.getState().pages)
+  console.log(`API runner createPages`)
 
+  // this creates nodes, which will mark us as dirty again
   await apiRunnerNode(`createPages`, {
     graphql: graphqlRunner,
     traceId: `watch-createPages`,
     waitForCascadingActions: true,
   })
 
-  console.log(`after pages`, store.getState().pages)
-
-  await writePages()
+  // console.log(`writePages`)
+  // await writePages()
 }
 
-let dirty = false
 
 emitter.on(`CREATE_NODE`, action => {
   console.log(`plugin-watcher CREATE_NODE`, action.traceId)
-  dirty = true
+  if (action.traceId !== `watch-createPages`) {
+    dirty = true
+  }
 })
 
 emitter.on(`API_RUNNING_QUEUE_EMPTY`, action => {
-  console.log(`plugin-watcher API_RUNNING_QUEUE_EMPTY`)
+  console.log(`plugin-watcher API_RUNNING_QUEUE_EMPTY dirty:${dirty}`)
   if (!dirty) {
     return
   }
   dirty = false
-
   updatePages()
 })

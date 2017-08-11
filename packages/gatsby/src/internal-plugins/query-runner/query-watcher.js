@@ -61,6 +61,7 @@ const getPagesForComponent = componentPath =>
 
 let watcher
 exports.watchComponent = componentPath => {
+  console.log('watchComponent ', componentPath);
   // We don't start watching until mid-way through the bootstrap so ignore
   // new components being added until then. This doesn't affect anything as
   // when extractQueries is called from bootstrap, we make sure that all
@@ -95,6 +96,7 @@ const watch = rootDir => {
   watcher = chokidar
     .watch(`${rootDir}/src/**/*.{js,jsx,ts,tsx}`)
     .on(`change`, path => {
+      console.log('query-watcher.js file changed:', path);
       debounceCompile()
     })
 }
