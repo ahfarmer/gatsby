@@ -22,6 +22,8 @@ exports.extractQueries = () => {
   const state = store.getState()
   const pagesAndLayouts = [...state.pages, ...state.layouts]
   const components = _.uniq(pagesAndLayouts.map(p => p.component))
+
+  // Update each component's query in the store
   queryCompiler().then(queries => {
     components.forEach(component => {
       const query = queries.get(normalize(component))
@@ -48,6 +50,7 @@ exports.extractQueries = () => {
 
 const runQueriesForComponent = componentPath => {
   const pages = getPagesForComponent(componentPath)
+
   // Remove page & layout data dependencies before re-running queries because
   // the changing of the query could have changed the data dependencies.
   // Re-running the queries will add back data dependencies.
@@ -75,8 +78,12 @@ exports.watchComponent = componentPath => {
     watcher.add(componentPath)
   }
 }
+
 const watch = rootDir => {
   if (watcher) return
+
+  // Whenever any component changes, all the queries for all the components
+  // will be updated and run. That's why this must be debounced.
   const debounceCompile = _.debounce(() => {
     queryCompiler().then(queries => {
       const components = store.getState().components

@@ -30,6 +30,8 @@ module.exports = (state = [], action) => {
       }
     case `DELETE_PAGE`:
       return state.filter(p => p.path !== action.payload.path)
+    case `TOUCH_PAGES`:
+      return state.map(p => Object.assign({}, p, { touch: true }))
     default:
       return state
   }

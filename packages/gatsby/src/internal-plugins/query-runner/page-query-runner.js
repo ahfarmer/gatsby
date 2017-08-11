@@ -16,7 +16,6 @@ let active = false
 
 exports.runQueries = async () => {
   active = true
-  const state = store.getState()
 
   // Run queued dirty nodes now that we're active.
   queuedDirtyActions = _.uniq(queuedDirtyActions, a => a.payload.id)
@@ -89,9 +88,10 @@ const findDirtyIds = actions => {
   const state = store.getState()
   return actions.reduce((dirtyIds, action) => {
     const node = state.nodes[action.payload.id]
+
     // Check if the node was deleted
     if (!node) {
-      return
+      return dirtyIds
     }
 
     // find invalid pagesAndLayouts
